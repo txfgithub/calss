@@ -1,0 +1,175 @@
+#include<iostream>
+#include<fstream>
+#include<string>
+using namespace std;
+#define N 100
+/*****************************************************************************************
+      系统应实现工资记录的逐条添加、保存、根据工号进行查询、浏览、删除，
+      并能在添加修改的同时自动完成个人所得税和应发工资的计算。
+*****************************************************************************************/
+class Employee{
+protected:
+	char number;//工号是由1~10个数字符号（0~9）组成的字符串
+	 char name;  //姓名是由1~10个字母或1~5个汉字组成的字符串
+	 float gwgz;//岗位工资
+	 float xjgz;//薪级工资
+	 float zwjt;//职务津贴
+	 float jxgz;//绩效工资
+	 float yfgz;//应发工资
+	 float grsd;//个人所得税
+	 float sfgz;//实发工资
+public:
+	Employee(){}
+	Employee(char num,char nam,float gwg,float xig,float zwj,float jxg,float yfg,float grs,float sfg);
+	void read();
+	void write();
+	void find();
+	void list();
+	void modify();
+	void del();
+	void add();
+	void grsds();
+
+	
+};
+void Employee::read()
+{ ofstream outf("gx.dat,ios::binary");
+  if(!outf)
+  {cout<<"无法打开文件"<<endl;
+   exit(1);
+  }
+  {
+int x;
+while(1)
+{
+printf("\n\n\t\t查子菜单\n");
+printf("\t\t********************\n");
+printf("\t\t 1.按职工号查询\n");
+printf("\t\t 0.返回主菜单\n");
+printf("\t\t********************\n");
+printf("\t请选择(0-1):");
+scanf("%d",&x);
+switch(x)
+{
+case 1:search_num();break;
+default :printf("\n Wrong!");
+}
+if(x==0) break;
+}
+}
+void search_num()
+{
+FILE *fp;
+int i;
+char num;
+if((fp=fopen("emp","rb"))==NULL)
+{
+printf("不能打开emp文件\n");
+exit(1);
+}
+printf("要查询的职工号:");
+scanf("%s",num);
+for(i=0;fread(&emp[i],sizeof(struct emploee),1,fp);i++)
+if(!strcmp(emp[i].no,num)) break;
+if(feof(fp))
+{
+printf("\t查无此人\n");
+exit(2);
+}
+printf("记录号 职工号 姓名 性别 年龄 工资\n");
+printf("%6d%6s%9s%4s%5d%6d\n",i+1,emp[i].no,emp[i].name,emp[i].sex,
+emp[i].age,emp[i].salar);
+fclose(fp);
+}
+  
+    
+
+}
+
+void Employee::write(){
+
+
+
+
+}
+void Employee::find(){
+
+
+
+
+
+
+}
+
+
+void Employee::list(){
+
+
+
+
+}
+
+
+void Employee::modify(){
+
+
+
+}
+
+
+void Employee::del(){
+
+
+
+
+
+}
+
+
+void Employee::add(){
+
+
+
+
+
+}
+
+
+
+void Employee::grsds(){
+
+
+
+
+
+}
+int main ()
+{ 
+    cout<<"***********************************************************************"<<endl;
+    cout<<"|                        欢迎进入职工信息管理系统                     |"<<endl;
+	cout<<"-----------------------------------------------------------------------"<<endl;
+	cout<<"|                              1.查询                                 |"<<endl;
+	cout<<"|                              2.修改                                 |"<<endl;
+	cout<<"|                              3.添加                                 |"<<endl;
+	cout<<"|                              4.删除                                 |"<<endl;
+	cout<<"|                              5.保存                                 |"<<endl;
+	cout<<"|                              6.显示                                 |"<<endl;
+	cout<<"|                              7.输入数据                             |"<<endl;
+	cout<<"-----------------------------------------------------------------------"<<endl;
+	cout<<"***********************************************************************"<<endl;
+	printf("请选择(0-7):\n");
+scanf("%d",&x);
+switch(x)
+{
+case 1: read();break;
+case 2: write();break;
+case 3: find();break;
+case 4: list();break;
+case 5: modify();break;
+case 6: del();break;
+case 7: add();break;
+default:printf("\n Wrong!");
+}
+	return 0;
+	
+}
