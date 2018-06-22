@@ -1,47 +1,48 @@
-还在 调试中
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#define NUM 1000
-void enter();//输入职工信息
-void find();//读取职工信息
-void dele_num();
-void modi_num();
-void browse();
-void count();
-void load();
-void add();//增加职工工资数据函数
-void menu(); 
-int n;   //员工的总数
-struct emploee  //职工数据结构
-{
-     char no;//工号是由1~10个数字符号（0~9）组成的字符串
-	 char name;  //姓名是由1~10个字母或1~5个汉字组成的字符串
-	 float gwgz;//岗位工资
-	 float xjgz;//薪级工资
-	 float zwjt;//职务津贴
-	 float jxgz;//绩效工资
-	 float yfgz;//应发工资
-	 float grsd;//个人所得税
-	 float sfgz;//实发工资
-}zggz[NUM],newzggz;
-void main()
-{
- menu();
-}
+还有bug
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
 
-void menu()//主界面
-{  int n,w1;
-   
+    //void read();//读取职工工资数据函数
+	void write();//保存职工工资数据函数
+	void find();//查询职工工资数据函数
+	void list();//浏览职工工资数据函数
+	void modify();//修改职工工资数据函数
+	void del();//删除职工工资数据函数
+	void add();//增加职工工资数据函数
+	void grsds();//定义计算职工工资数据函数
+
+struct Employee //职工数据结构
+{
+	 char number[10];    //职员工号
+    char name[10];    //职员姓名
+    float gw_salary;    //岗位工资
+    float xj_salary;    //薪级工资
+    float subsidy;    //职务津贴
+    float jx_salary;    //绩效工资
+    float yf_salary;    //应发工资
+    float tax;    //个人所得税
+    float actual_wage;    //实发工资
+    }zggz[100];
+	int n = 0;	//全局变量n，用于记录写入结构体数据的总数
+
+    void grsds(int m);    //声明计算职工工资数据函数
+
+
+int main()
+{   //read();
+  int n,w1;
+
    do
    { system("cls");  
       printf("************* 职工工资管理系统 **************\n");
-      printf("*            1-----输入信息                    *\n");
-      printf("*            2-----查询                    *\n");
-      printf("*            3-----添加              *\n");
-      printf("*            4-----删除              *\n");
-      printf("*            5-----保存             *\n");
-      printf("*            6-----浏览                    *\n");
+      printf("*            1-----查询                    *\n");
+      printf("*            2-----添加              *\n");
+      printf("*            3-----删除              *\n");
+      printf("*            4-----修改             *\n");
+      printf("*            5-----浏览                    *\n");
+      printf("*            6-----保存                  *\n");
       printf("*            7-----退出                           *\n");
       printf("***************************************************\n");
   printf("       输入您的选择(1-7):[ ]\b\b");
@@ -49,243 +50,332 @@ void menu()//主界面
   if(n<1||n>7)                                    //对选择的数字作判断
          {
             w1=1;
-            printf("your choice is not between 1 and 9,Please input again:");
+            printf("your choice is not between 1 and 7,Please input again:");
             getchar();
           }
          else    w1=0;
       } 
     while(w1==1);
   switch(n)
-  { case 1:enter();    break;   
-    case 2:find();   break;  
-    case 3:add();   break;    
-    case 4:dele_num();   break;    
-    case 5:count ();    break;    
-    case 6:browse();   break;      //保存模块
+  {  
+    case 1:find();   break;  
+    case 2:add();   break;    
+    case 3:del();   break;    
+    case 4:modify();  break;    
+    case 5:list();   break;      
+	case 6:write();   break;   
     case 7:printf("\n×××××××谢谢，欢迎下次光临！×××××××\n\n");  
-    
+
     default:exit(0);  //退出系统,exit(0)函数功能是退出程序。
   }
+  return 0;
 }
-/*************************输入模块**********************/
-void enter()
-{
-     FILE *fp;
-     int n,i;
-     if ((fp=fopen("zggz.txt","wb"))==NULL)
-     {
- 
-     printf("不能建立zggz文件\n");
-     exit(1);
-     }
-     printf("输入职工人数:");
-    scanf("%d",&n);
-     printf("输入格式:工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资<Enter>\n");
-     for(i=0;i<n;i++)   /*  循环获取n个职工记录 */
-     {
-         printf("第%d个职工:",i+1);
-         scanf("%s%s%s%d%f%f%f%f%f",zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);
-         zggz[i].sfgz=zggz[i].gwgz+zggz[i].xjgz+zggz[i].zwjt+zggz[i].jxgz-zggz[i].grsd;
-     }
-     for(i=0;i<n;i++)      /*将n个职工记录写入文件*/
-          fwrite(&zggz[i],sizeof(struct emploee),1,fp);
-     fclose(fp);
-}
-/*************************统计模块**********************/
-void count()
-{
-     FILE *fp;
-     int n,num;
-     if((fp=fopen("zggz.txt","rb"))==NULL)
-     {
-         printf("不能打开zggz文件\n");
-         exit(1);
-     }
-     printf("请输入工资数:");
-     scanf("%d",&num);
-     printf("记录号 工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资\n");
-     for(n=0;fread(&emp[n],sizeof(struct emploee),1,fp)!=0;n++)
-     if(emp[n].wage3>=num)
-     printf("%6d%6s%9s%4s%5d   %.1f   %.1f  %.1f   %.1f   %.1f   %.1f\n",n+1,zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);
-     fclose(fp);
-}
-/********************删除模块*******************/
 
-void dele_num()
+/*void read()
 {
-     FILE *fp;
-     int i,j,n;
-     char num[5];
-     if((fp=fopen("emp.txt","rb"))==NULL)
-     {
-         printf("不能打开emp文件\n");
-         exit(1);
-      }
-     printf("删除前:\n");
-     printf("记录号 工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资\n");
-    for(n=0;fread(&emp[n],sizeof(struct emploee),1,fp);n++)
-     printf("%6d%6s%9s%4s%5d   %.1f   %.1f   %.1f   %.1f   %.1f   %.1f\n",n+1,zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);/*n为emp文件中记录数*/
-     printf("要删除的职工号:");
-     scanf("%s",num);
-     for(i=0;(strcmp(emp[i].no,num)!=0&&i<n);i++)
-     if(i>=n)
-     {
-          printf("\t没有%s职工号的职工\n",num);
-          exit(2);
-     }
-     fclose(fp);
-     fp=fopen("emp.dat","w+");
-     if(n==1)  /*一个记录已经删除了*/
-     {
-           fclose(fp);
-           exit(3);
-     }
-     for(j=0;j<i;j++)
-        fwrite(&emp[j],sizeof(struct emploee),1,fp);
-     for(j=i+1;j<n;j++)
-         fwrite(&emp[j],sizeof(struct emploee),1,fp);
-     printf("删除后:\n");
-     fseek(fp,0,SEEK_SET);
-     printf("记录号 工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资\n");
-     for(i=0;fread(&emp[i],sizeof(struct emploee),1,fp);i++)
-         printf("%6d%6s%9s%4s%5d%   %.1f    %.1f   %.1f   %.1f   %.1f   %.1f\n",i+1,zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);
-       fclose(fp);
-}
-/********************修改模块*******************/
-void modi_num()
+	FILE *fp;
+	int i=0;
+	if((fp=fopen("gz.dat","rb"))==NULL)
+	{
+		cout<<"无法打开文件"<<endl;
+		exit(0);
+	}
+	else
+	{
+		do
+		{
+			fread(&zggz[i],sizeof(struct employee),1,fp);
+			i++;
+		}
+		while(feof(fp)==0);
+	}
+	fclose(fp);
+	return(i-1);
+}*/
+void write()    //保存职工工资数据函数
 {
-     FILE *fp;
-     int i,j;
-     char num[5];
-     if((fp=fopen("emp.txt","rb+"))==NULL)
-     {
-         printf("不能 打开emp文件\n");
-         exit(1);
-     }
-     printf("要修改的职工号:");
-     scanf("%s",num);
-     for(i=0;fread(&emp[i],sizeof(struct emploee),1,fp);i++)
-    if(!strcmp(emp[i].no,num))break;
-     if(feof(fp))
-     {
-          printf("\t没有%s职工号的职工\n",num);
-          exit(2);
-     }
-     printf("记录号 工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资\n");
-     printf("%6d%6s%9s%4s%5d%   %.1f   %.1f   %.1f   %.1f   %.1f   %.1f\n",i+1,zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);
-    printf("输入格式:职工号   姓名 性别 年龄 基本工资 职务工资 公积金  水电费 税 <Enter>\n");
-    printf("第%d个记录:",i+1);
-    scanf("%s%s%s%d%f%f%f%f%f",newemp.no,newemp.name,newemp.sex,&newemp.age,
-               &newemp.wage1,&newemp.wage2,&newemp.funds,&newemp.WATERfee,&newemp.TAXfee);//获取新的职工记录
-             newemp.wage3=newemp.wage1+newemp.wage2+newemp.funds-newemp.WATERfee-newemp.TAXfee;
-    fseek(fp,-(long)sizeof(struct emploee),SEEK_CUR);  //文件指针指向该修改的记录开头
-     fwrite(&newemp,sizeof(struct emploee),1,fp);  //用newemp覆盖当前记录
-     printf(" 修改后:\n");
-    fseek(fp,0,SEEK_SET);        //显示修改后的文件数据
-     printf("记录号 工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资\n");
-     for(i=0;fread(&emp[i],sizeof(struct emploee),1,fp)!=0;i++)
-         printf("%6d%6s%9s%4s%5d   %.1f   %.1f  %.1f   %.1f  %.1f   %.1f\n",i+1,zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);
+    FILE *fp = fopen("gx.dat","wb+");
+    int i = 0;
+
+    if((fp == NULL))    //打开当前目录下文件
+    {
+        printf("\n文件打开失败！");
+        getch();
+        exit(-1);
+    }
+
+	for(i = 0; i < n; i ++)
+    {
+        fwrite(&zggz[i], sizeof(zggz[i]), 1, fp);    //将数据写入二进制文件
+        fprintf(fp, "\n");    //给写入文件的数据尾部加入换行符
+    }
+
     fclose(fp);
+    printf("\n文件保存完毕！");
+    printf("\n共有%d条数据被写入二进制文件\n\n", n);
 }
- /*************************查询模块***********************/
-void find()
+
+void find()    //查询职工工资数据函数
 {
-     FILE *fp;
-     int i; 
-     char num[5];
-     if((fp=fopen("emp.txt","rb"))==NULL)
-     {
-          printf("不能打开emp文件\n");
-          exit(1);
-     }
-     printf("要查询的职工号:");
-     scanf("%s",num);
-     for(i=0;fread(&emp[i],sizeof(struct emploee),1,fp);i++)
-         if(!strcmp(emp[i].no,num)) break;
-    if(feof(fp))
-    {
-        printf("\t查无此人\n");
-        exit(2);
-    }
-     printf("记录号 工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资\n");
-     printf("%6d%6s%9s%4s%5d  %.1f  %.1f  %.1f  %.1f   %.1f   %.1f\n",i+1,zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);
-       fclose(fp);
+    char gonghao[10];
+    int i;
+	int flag = 1;
+
+    printf("\n请输入所要查询的工号：");
+    do{
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+            if(strcmp(gonghao, &zggz[i].number[10]) == 0)
+            {
+                printf("\n职员工号：%s\t\n姓名：%s\t\n岗位工资：%f\t", 
+                        zggz[i].number, zggz[i].name, zggz[i].gw_salary);
+                printf("\n薪级工资：%f\t\n职务津贴：%f\t\n绩效工资：%f\t", 
+                        zggz[i].xj_salary, zggz[i].subsidy, zggz[i].jx_salary);
+                printf("\n应发工资：%f\t\n个人所得税：%f\t\n实发工资：%f\t\n",
+                        zggz[i].yf_salary, zggz[i].tax, zggz[i].actual_wage);
+		    	flag = 0;
+                break;
+            }
+        }
+        if(i == n)
+        {
+            printf("\n无此工号职员信息\n");
+	    	printf("\n请输入正确的工号：");
+        }
+    }while(flag);
 }
-/*******************浏览模块********************/
-void browse()
-{    int i;
-     FILE *fp;
-     if((fp=fopen("emp.txt","r"))==NULL)
-     {     
-         printf("不能打开emp文件\n");
-         exit(0);
-     }
-     printf("记录号 工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资\n");
-     for(i=0;fread(&emp[i],sizeof(struct emploee),1,fp)!=0;i++)
-     {
-          printf("%6d%6s%9s%4s%5d  %.1f  %.1f     %.1f    %.1f    %.1f   %.1f\n",i+1,zggz[i].no,zggz[i].name,zggz[i].gwgz,&zggz[i].xjgz,
-           &zggz[i].zwjt,&zggz[i].jxgz,&zggz[i].yfgz,&zggz[i].grsd,&zggz[i].sfgz);
-    }
-    fclose(fp);
-}
-/******************追加模块*******************/
-void add()
+
+void list()    //浏览职工工资数据函数
 {
-      FILE *fp;
-      int n,i,j;
-      if((fp=fopen("emp.txt","ab+"))==NULL)
-      {
-          printf("不能打开emp文件\n");
-           exit(0);
-      }
-    printf("要追加的职工人数:");
-      scanf("%d",&n);
-      for(i=0;i<n;i++) 
-      { 
-          printf("输入格式:工号 姓名 岗位工资 薪级工资 职务津贴 绩效工资  应发工资 个人所得税  实发工资  <Enter>\n");
-         printf("追加记录:\n");
-         scanf("%s%s%s%d%f%f%f%f%f",newemp.no,newemp.name,newemp.sex,&newemp.age,
-                   &newemp.wage1,&newemp.wage2,&newemp.funds,&newemp.WATERfee,&newemp.TAXfee);
-             newemp.wage3=newemp.wage1+newemp.wage2+newemp.funds-newemp.WATERfee-newemp.TAXfee;//获取一个新的职工记录
-        fwrite(&newemp,sizeof(struct emploee),1,fp);   //将该职工记录写入文件
-      }
-      fclose(fp);
+    char gonghao[10];
+    int i, j;
+	int flag = 1;
+
+    do{
+        printf("\n请输入所要浏览的工号：");
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+            if(strcmp(gonghao, &zggz[i].number[10]) == 0)
+            {
+                for(j = i; j < n; j ++)
+                {
+                    printf("\n职员工号：%s\t\n职员姓名：%s\t\n岗位工资：%f\t",
+                            zggz[j].number, zggz[j].name, zggz[j].gw_salary);
+                    printf("\n薪级工资：%f\t\n职务津贴：%f\t\n绩效工资：%f\t", 
+                            zggz[j].xj_salary, zggz[j].subsidy, zggz[j].jx_salary);
+                    printf("\n应发工资：%f\t\n个人所得税：%f\t\n实发工资：%f\t\n", 
+                            zggz[j].yf_salary, zggz[j].tax, zggz[j].actual_wage);
+                }
+		    	flag = 0;
+                break;
+            }
+        }
+        if(i == n)
+        {
+            printf("\n无此工号职员信息\n");
+        }
+    }while(flag);
 }
- 
-/*************************载入模块**********************/
-void load()          //加载记录或可以计算记录个数的函数
+
+void modify()    //修改职工工资数据函数
 {
-     FILE *fp;
-     int i,w;
-     w=1;
-     system( "cls" ); 
-    if((fp=fopen("emp.txt","rb"))==NULL)      //以输出打开方式,在此前的记录被覆盖
+    char gonghao[10];
+    int i;
+    int flag = 1;
+
+    do
     {
-        printf("\nCannot open file\n");
-        w=0;
-        return ;
-    }
-    n=0;
-    for(i=0;!feof(fp);i++)
-    {   
-        fread(&emp[i],sizeof(struct emploee),1,fp);
-        n++;
-    }
-    n=n-1;
-          fclose(fp);
-    if(w==1) 
+        printf("\n请输入所要重新录入的职员工号：");
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+            if(strcmp(gonghao, &zggz[i].number[10]) == 0)
+            {
+                printf("\n请重新录入该职工数据：\n");
+                /*
+                printf("\n职员工号：");
+                scanf("%s", zggz[i].number);
+                */
+
+                printf("\n职员姓名：");    //输入职员姓名
+                scanf("%s", zggz[i].name);
+
+                printf("\n岗位工资：");    //输入岗位工资
+                scanf("%f", &zggz[i].gw_salary);
+
+                printf("\n薪级工资：");    //输入薪级工资
+                scanf("%f", &zggz[i].xj_salary);
+
+				printf("\n职务津贴：");    //输入职务津贴
+				scanf("%f", &zggz[i].subsidy);
+
+				printf("\n绩效工资：");    //输入绩效工资
+				scanf("%f", &zggz[i].jx_salary);
+
+				zggz[i].yf_salary = zggz[i].gw_salary + zggz[i].xj_salary 
+                        + zggz[i].subsidy + zggz[i].jx_salary;
+
+                grsds(n);    //计算个人所得税
+
+                zggz[n].actual_wage = zggz[n].yf_salary - zggz[n].tax;
+            }
+        }
+    	if(i == n)
+        {
+            printf("\n无此工号职工信息\n");
+        }
+    }while(flag);
+}
+
+void del()    //删除职工工资数据函数
+{
+    char gonghao[10];
+    int i, j;
+	int flag = 1;
+
+	do
     {
-        printf("Load file ok!");
-        getchar();
-        getchar();
-        menu();                
+        printf("\n请输入所要删除的职员工号：");
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+            if(strcmp(gonghao, zggz[i].number) == 1)
+            {
+                for(j = i; j < n; j ++)
+                {
+                    zggz[j] = zggz[j+1];
+                }
+                n -= 1;
+                break;
+            }
+        }
+        if(i == n)    //查找后不存在工号
+        {
+            printf("\n无此工号职工信息\n");
+		}
+    }while(flag);
+}
+
+void add()    //添加职工工资数据函数
+{
+    char ch, s[10];
+	int i;
+	int flag = 0;
+
+    printf("\n请输入职工基本信息：");
+    for(; n < 100; n ++)
+    {
+        do
+        {
+            printf("\n职员工号：");    //输入职员工号
+            scanf("%s", s);
+            for(i = 0; i < n; i ++)
+            {
+                if(strcmp(s, &zggz[i].number[10]) == 0)
+                {
+                    printf("\n该职员工号已存在，请重新输入！\n");
+                    flag = 1;
+                    break;
+                }
+            }
+            if(i == n)    //职员工号无重复，开始赋值
+            {
+                strcpy(s, zggz[n].number);
+                flag = 0;
+            }
+        }while(flag);
+
+        printf("\n职员姓名：");    //输入职员姓名
+        scanf("%s", zggz[n].name);
+
+        printf("\n岗位工资：");    //输入岗位工资
+        scanf("%f", &zggz[n].gw_salary);
+
+        printf("\n薪级工资：");    //输入薪级工资
+        scanf("%f", &zggz[n].xj_salary);
+
+        printf("\n职务津贴：");    //输入职务津贴
+        scanf("%f", &zggz[n].subsidy);
+
+        printf("\n绩效工资：");    //输入绩效工资
+        scanf("%f", &zggz[n].jx_salary);
+
+    	zggz[n].yf_salary = zggz[n].gw_salary + zggz[n].xj_salary
+		    +zggz[n].subsidy + zggz[n].jx_salary;    //计算应发工资
+
+        grsds(n);    //计算个人所得税
+
+        zggz[n].actual_wage = zggz[n].yf_salary - zggz[n].tax;   //计算实发工资
+
+        printf("\n是否结束输入？是：y 否：n");    //判断是否要结束输入
+        scanf("%s", &ch);
+        if(strcmp(&ch, "y") == 0)
+        {
+            break;
+        }
+        else if(strcmp(&ch, "n") == 0)
+        {
+            continue;
+        }
     }
 }
- 
+
+void grsds(int m)    //计算职工个人所得税函数
+{
+	double count, tax;
+	int flag = 0;
+	count = zggz[n].yf_salary;
+	zggz[n].tax = 0;
+
+    do
+    {
+        if(count < 500)
+        {
+	        tax = count * 0.05;
+            flag = 0;
+        }
+        else if(count < 2000)
+        {
+            tax = (count - 500) * 0.1;
+	    	count -= 500;
+        }
+        else if(count < 5000)
+        {
+    		tax = count - 2000 * 0.15;
+	    	count -= 2000;
+        }
+        else if(count < 20000)
+        {
+    		tax = (count - 5000) * 0.2;
+	    	count -= 5000;
+        }
+        else if(count < 40000)
+        {
+    		tax = (count - 20000) * 0.25;
+	    	count -= 20000;
+        }
+        else if(count < 60000)
+        {
+    		tax = (count - 40000) * 0.3;
+	    	count -= 40000;
+        }
+        else if(count < 80000)
+        {
+            tax = (count - 60000) * 0.35;
+	    	count -= 60000;
+        }
+        else if(count < 10000)
+        {
+    		tax = (count - 80000) * 0.4;
+	    	count -= 80000;
+        }
+        else
+        {
+            tax = (count - 100000) * 0.45;
+	    	count -= 100000;
+        }
+        zggz[n].tax += tax;
+    }while(flag);
+}
