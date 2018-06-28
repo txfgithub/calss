@@ -1,0 +1,383 @@
+#include<stdio.h>
+#include<string.h>
+#include<Windows.h>
+#include<time.h>
+#include<conio.h>
+#include<iostream>
+using namespace std;
+#define NUM 100      //系统容量
+
+void read();          //读取职工工资数据函数
+void write();       //保存职工工资数据函数
+void find();         //查询职工工资数据函数
+void list();         //浏览职工工资数据函数
+void modify();       //修改职工工资数据函数
+void del();          //删除职工工资数据函数
+void add();          //添加职工工资数据函数
+void grsds(int);     //计算个人所得税函数
+
+int n;   //员工的总数
+void grsds(int i);
+
+struct employee  //职工数据结构
+{
+     char number[10];//工号是由1~10个数字符号（0~9）组成的字符串
+	 char name[10];  //姓名是由1~10个字母或1~5个汉字组成的字符串
+	 float gwgz;//岗位工资
+	 float xjgz;//薪级工资
+	 float zwjt;//职务津贴
+	 float jxgz;//绩效工资
+	 float yfgz;//应发工资
+	 float grsd;//个人所得税
+	 float sfgz;//实发工资
+}zggz[100];
+
+
+void main()
+{   read();
+  int n,w1;
+   
+   do
+   { system("cls");  
+      printf("************* 职工工资管理系统 ********************\n");
+      printf("*            1-----查询                           *\n");
+      printf("*            2-----修改                           *\n");
+      printf("*            3-----添加                           *\n");
+      printf("*            4-----删除                           *\n");
+      printf("*            5-----保存                           *\n");
+      printf("*            6-----浏览                           *\n");
+      printf("*            7-----退出                           *\n");
+      printf("***************************************************\n");
+  printf("       输入您的选择(1-7):[ ]\b\b");
+  scanf("%d",&n);
+  if(n<1||n>7)                                    //对选择的数字作判断
+         {
+            w1=1;
+            printf("your choice is not between 1 and 9,Please input again:");
+            getchar();
+          }
+         else    w1=0;
+      } 
+    while(w1==1);
+ switch(n)
+  {  
+    case 1:find();   break;  
+    case 2:modify();   break;    
+    case 3:add();   break;    
+    case 4:del();  break;    
+    case 5:write();   break;      
+	case 6:list();   break;   
+    case 7:printf("\n×××××××谢谢，欢迎下次光临！×××××××\n\n");  
+    
+    default:exit(0);  //退出系统,exit(0)函数功能是退出程序。
+  }
+}
+void read()
+{
+	FILE *fp;
+	int i=0;
+	if((fp=fopen("gz.dat","rb"))==NULL)
+	{
+		cout<<"无法打开文件"<<endl;
+		exit(0);
+	}
+	else
+	{
+		do
+		{
+			fread(&zggz[i],sizeof(struct employee),1,fp);
+			i++;
+		}
+		while(feof(fp)==0);
+	}
+	fclose(fp);
+	
+}
+void add()//添加职工工资数据函数
+{
+	FILE *fp;
+	int n,i,j;
+	if((fp=fopen("gz.dat","ab+"))==NULL)
+	{
+		cout<<"无法打开gz文件"<<endl;
+		exit(0);
+	}
+	cout<<"要添加的职工人数：";
+	cin>>n;
+	for(i=0;i<n;i++)
+	{
+		cout<<"职工号：";
+		cin>>zggz[i].number;
+		cout<<"姓名：";
+		cin>>zggz[i].name;
+		cout<<"岗位工资：";
+		cin>>zggz[i].gwgz;
+		cout<<"薪级工资：";
+		cin>>zggz[i].xjgz;
+		cout<<"职务津贴：";
+		cin>>zggz[i].zwjt;
+		cout<<"绩效工资：";
+		cin>>zggz[i].jxgz;
+		zggz[i].yfgz=zggz[i].gwgz+zggz[i].xjgz+zggz[i].zwjt+zggz[i].jxgz;
+		fwrite(&zggz[i],sizeof(struct employee),1,fp);
+	}
+	cout<<"添加成功"<<endl;
+	getchar();
+	system("cls");
+	fclose(fp);
+}
+
+void write()    //定义保存职工工资数据函数
+{
+    FILE *fp = fopen("gx.dat","wb+");
+    int i = 0;
+
+    if((fp == NULL))    //打开当前目录下文件
+    {
+        printf("\n文件打开失败！");
+      getch();
+        exit(-1);
+    }
+
+	for(i = 0; i < n; i ++)
+    {
+        fwrite(&zggz[i], sizeof(zggz[i]), 1, fp);    //将数据写入二进制文件
+        fprintf(fp, "\n");   
+    }
+
+    fclose(fp);
+    printf("\n文件保存完毕！");
+    printf("\n共有%d条数据被写入二进制文件\n\n", n);
+}
+void find()//查询职工工资数据函数
+{
+    char gonghao[10];
+    int i,t;
+	int flag = 1;
+
+    printf("\n请输入所要查询的工号：");
+    do{
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+          if(strcmp(gonghao, &zggz[i].number[10]) == 0)
+            {
+			cout<<"--------------------------------------------------------------"<<endl;
+			cout<<"你要查询的是："<<endl;
+			cout<<"工号  姓名  岗位工资  薪级工资  职务津贴  绩效工资  应发工资"<<endl;
+			cout<<zggz[i].number<<"     "
+			    <<zggz[i].name<<"     "
+			    <<zggz[i].gwgz<<"     "
+			    <<zggz[i].xjgz<<"     "
+			    <<zggz[i].zwjt<<"     "
+			    <<zggz[i].jxgz<<"     "
+			    <<zggz[i].yfgz<<endl;
+			cout<<"--------------------------------------------------------------"<<endl;
+			flag = 0;
+                break;
+			}
+        }
+        if(i == n)
+        {
+            printf("\n无此工号职员信息\n");
+	    	printf("\n请输入正确的工号：");
+        }
+    }while(flag);
+	cout<<"继续查询请按1，返回请按2"<<endl;
+	cin>>t;
+	switch(t)
+	{
+	    case 1:find(); break;
+		case 2: system("cls"); break;
+		default:break;
+	}
+}
+void list()    //浏览职工工资数据函数
+{
+    char gonghao[10];
+    int i, j,t;
+	int flag = 1;
+
+    do{
+        printf("\n请输入所要浏览的工号：");
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+            if(strcmp(gonghao, &zggz[i].number[10]) == 0)
+            {
+                for(j = i; j < n; j ++)
+               {
+			cout<<"--------------------------------------------------------------"<<endl;
+			cout<<"你要查询的是："<<endl;
+			cout<<"工号  姓名  岗位工资  薪级工资  职务津贴  绩效工资  应发工资"<<endl;
+			cout<<zggz[i].number<<"     "
+			    <<zggz[i].name<<"     "
+			    <<zggz[i].gwgz<<"     "
+			    <<zggz[i].xjgz<<"     "
+			    <<zggz[i].zwjt<<"     "
+			    <<zggz[i].jxgz<<"     "
+			    <<zggz[i].yfgz<<endl;
+			cout<<"--------------------------------------------------------------"<<endl;
+			}
+		    	flag = 0;
+                break;
+            }
+        }
+        if(i == n)
+        {
+            printf("\n无此工号职员信息\n");
+        }
+    }while(flag);
+	cout<<"继续查询请按1，返回请按2"<<endl;
+	cin>>t;
+	switch(t)
+	{
+	    case 1:find(); break;
+		case 2: system("cls"); break;
+		default:break;
+	}
+}
+void modify()    //修改职工工资数据函数
+{
+    char gonghao[10];
+    int i,t;
+    int flag = 1;
+
+    do
+    {
+        printf("\n请输入所要重新录入的职员工号：");
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+          if(strcmp(gonghao, &zggz[i].number[10]) == 0)
+            {
+                printf("\n请重新录入该职工数据：\n");
+               
+			cout<<"--------------------------------------------------------------"<<endl;
+			cout<<"要修改的职工信息："<<endl;
+			cout<<"工号  姓名  岗位工资  薪级工资  职务津贴  绩效工资  应发工资"<<endl;
+			cout<<zggz[i].number<<"     "
+			    <<zggz[i].name<<"     "
+			    <<zggz[i].gwgz<<"     "
+			    <<zggz[i].xjgz<<"     "
+			    <<zggz[i].zwjt<<"     "
+			    <<zggz[i].jxgz<<"     "
+			    <<zggz[i].yfgz<<endl;
+			cout<<"--------------------------------------------------------------"<<endl;
+
+				zggz[i].yfgz=zggz[i].gwgz+zggz[i].xjgz+zggz[i].zwjt+zggz[i].jxgz;
+
+                grsds(n);    //计算个人所得税
+
+                zggz[n].sfgz = zggz[n].yfgz - zggz[n].grsd;
+            }
+        }
+    	if(i == n)
+        {
+            printf("\n无此工号职工信息\n");
+        }
+    }while(flag);
+		cout<<"继续修改请按1,返回请按任意键";
+		 cin>>t;
+		 switch(t)
+			{
+			     case 1:modify(); break;
+				 default:break;
+			 }
+		 system("cls");
+}
+void del()    //删除职工工资数据函数
+{
+    char gonghao[10];
+    int i, j,t;
+	int flag = 1;
+
+	do
+    {
+        printf("\n请输入所要删除的职员工号：");
+        scanf("%s", gonghao);
+        for(i = 0; i < n; i ++)
+        {
+            if(strcmp(gonghao, zggz[i].number) == 1)
+            {
+                for(j = i; j < n; j ++)
+                {
+                    zggz[j] = zggz[j+1];
+                }
+                n -= 1;
+                break;
+            }
+        }
+        if(i == n)    //查找后不存在工号
+        {
+            printf("\n无此工号职工信息\n");
+		}
+    }while(flag);
+	cout<<"继续修改请按1,返回请按任意键";
+		 cin>>t;
+		 switch(t)
+			{
+			     case 1:modify(); break;
+				 default:break;
+			 }
+		 system("cls");
+
+}
+void grsds(int i)
+{
+	float b,t;             
+	b=zggz[i].yfgz-3500;    //应纳税所得金额-起征点
+	t=zggz[i].yfgz;
+	if(b<=0)
+	{
+		cout<<"   0%  "<<zggz[i].sfgz;
+	}
+	else
+	{
+		if(b>0&&b<500)
+		{
+		    t=t-float(t*0.5);
+		    cout<<"       0%  "<<t;
+		}
+		if(b>500&&b<2000)
+		{
+		    t=t-float(t*0.1-25);
+		    cout<<"       10%    "<<t;
+		}
+		if(b>2000&&b<5000)
+		{
+                    t=t-float(t*0.15-125);
+		    cout<<"       15%    "<<t;
+		}
+		if(b>5000&&b<20000)
+		{
+                    t=t-float(t*0.2-375);
+		    cout<<"       20%    "<<t;
+		}
+		if(b>20000&&b<40000)
+		{
+                    t=t-float(t*0.25-1375);
+		    cout<<"       25%    "<<t;
+		}
+		if(b>40000&&b<60000)
+		{
+                    t=t-float(t*0.3-3375);
+		    cout<<"       30%    "<<t;
+		}
+		if(b>60000&&b<80000)
+		{
+                    t=t-float(t*0.35-6375);
+		    cout<<"       35%    "<<t;
+		}
+		if(b>80000&&b<100000)
+		{
+                    t=t-float(t*0.4-10375);
+		    cout<<"       40%    "<<t;
+		}
+		if(b>100000)
+		{
+                    t=t-float(t*0.45-15375);
+		    cout<<"       45%    "<<t;
+		}
+	}
+}
